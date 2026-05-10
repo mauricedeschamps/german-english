@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>LangApp</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
+  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* ダークモード (デフォルト) */
+    body.dark {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-card: #2a2a2a;
+      --text-primary: #eeeeee;
+      --text-secondary: #aaaaaa;
+      --border: #333333;
+      --accent: #4c9aff;
+      --accent-hover: #6aaeff;
+      --header-footer-bg: #0a0a0a;
+    }
+
+    /* クリアモード (ライト) */
+    body.light {
+      --bg-primary: #f5f7fa;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-hover: #3b82f6;
+      --header-footer-bg: #ffffff;
+    }
+
+    body {
+      background: var(--bg-primary);
+    }
+
+    /* ヘッダー・フッターは固定せず通常フロー */
+    header {
+      background: var(--header-footer-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    button, .lang-btn, .theme-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: 0.1s;
+    }
+
+    button:hover, .lang-btn:hover, .theme-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .back-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      min-height: 70vh;
+    }
+
+    footer {
+      background: var(--header-footer-bg);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2rem 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* 単語リスト */
+    .part-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .part-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border-left: 5px solid var(--accent);
+      padding-left: 1rem;
+    }
+
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .word-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .word-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      border-color: var(--accent);
+    }
+
+    .word-text {
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    .word-part {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* 詳細ページ */
+    .detail-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .detail-word {
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .detail-part {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 2rem;
+    }
+
+    .detail-card {
+      background: var(--bg-card);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+
+    .example {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 1rem;
+      margin: 1rem 0;
+      font-style: italic;
+    }
+
+    .audio-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .other-langs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    hr {
+      border-color: var(--border);
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls {
+        justify-content: flex-end;
+      }
+      .word-text {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body class="dark">
+  <header>
+    <h1 id="app-title">🌍 LangApp</h1>
+    <div class="controls">
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">🌓 Dark/Light</button>
+      <div style="display: flex; gap: 0.5rem;">
+        <button data-lang="en" class="lang-btn">🇬🇧 EN</button>
+        <button data-lang="de" class="lang-btn">🇩🇪 DE</button>
+        <button data-lang="ja" class="lang-btn">🇯🇵 日本語</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- 動的に描画 -->
+    <div style="text-align: center;">Loading vocabulary...</div>
+  </main>
+
+  <footer>
+    <div id="footer-contact">Contact us<br>mementomorikatsu@gmail.com</div>
+    <a href="mailto:mementomorikatsu@gmail.com" style="display: inline-block; margin-top: 0.5rem;">📧 Send email</a>
+  </footer>
+
+  <script>
+    // ---------- 単語データ (英語・ドイツ語・日本語, 品詞, 例文) ----------
+    // 助動詞 (modal) を新たに追加
+    const vocabulary = [
+      // 名詞 (noun)
+      { id: 1, en: "apple", de: "Apfel", ja: "リンゴ", part: "noun", 
+        example_en: "I eat an apple every day.", example_de: "Ich esse jeden Tag einen Apfel.", example_ja: "私は毎日リンゴを食べます。" },
+      { id: 2, en: "arm", de: "Arm", ja: "腕", part: "noun",
+        example_en: "My arm is sore.", example_de: "Mein Arm tut weh.", example_ja: "腕が痛いです。" },
+      { id: 3, en: "friend", de: "Freund", ja: "友達", part: "noun",
+        example_en: "He is my best friend.", example_de: "Er ist mein bester Freund.", example_ja: "彼は私の親友です。" },
+      { id: 4, en: "house", de: "Haus", ja: "家", part: "noun",
+        example_en: "This house is big.", example_de: "Dieses Haus ist groß.", example_ja: "この家は大きいです。" },
+      // 動詞 (verb)
+      { id: 5, en: "begin", de: "beginnen", ja: "始める", part: "verb",
+        example_en: "Let's begin the lesson.", example_de: "Beginnen wir mit der Lektion.", example_ja: "授業を始めましょう。" },
+      { id: 6, en: "drink", de: "trinken", ja: "飲む", part: "verb",
+        example_en: "I drink water.", example_de: "Ich trinke Wasser.", example_ja: "私は水を飲みます。" },
+      { id: 7, en: "find", de: "finden", ja: "見つける", part: "verb",
+        example_en: "Can you find my key?", example_de: "Kannst du meinen Schlüssel finden?", example_ja: "私の鍵を見つけられますか？" },
+      { id: 8, en: "love", de: "lieben", ja: "愛する", part: "verb",
+        example_en: "I love music.", example_de: "Ich liebe Musik.", example_ja: "私は音楽が大好きです。" },
+      // 形容詞 (adj)
+      { id: 9, en: "good", de: "gut", ja: "良い", part: "adj",
+        example_en: "This is a good idea.", example_de: "Das ist eine gute Idee.", example_ja: "これは良いアイデアです。" },
+      { id: 10, en: "bitter", de: "bitter", ja: "苦い", part: "adj",
+        example_en: "The coffee is bitter.", example_de: "Der Kaffee ist bitter.", example_ja: "コーヒーは苦いです。" },
+      { id: 11, en: "cold", de: "kalt", ja: "冷たい", part: "adj",
+        example_en: "It's very cold today.", example_de: "Heute ist es sehr kalt.", example_ja: "今日はとても寒いです。" },
+      { id: 12, en: "warm", de: "warm", ja: "暖かい", part: "adj",
+        example_en: "The soup is warm.", example_de: "Die Suppe ist warm.", example_ja: "スープは暖かいです。" },
+      // その他 (other)
+      { id: 13, en: "under", de: "unter", ja: "下に", part: "other",
+        example_en: "The cat is under the table.", example_de: "Die Katze ist unter dem Tisch.", example_ja: "猫はテーブルの下にいます。" },
+      { id: 14, en: "and", de: "und", ja: "〜と", part: "other",
+        example_en: "You and me.", example_de: "Du und ich.", example_ja: "あなたと私。" },
+      // 助動詞 (modal) - 新規追加
+      { id: 15, en: "can", de: "kann", ja: "できる", part: "modal",
+        example_en: "I can speak English.", example_de: "Ich kann Englisch sprechen.", example_ja: "私は英語を話せます。" },
+      { id: 16, en: "must", de: "müssen", ja: "しなければならない", part: "modal",
+        example_en: "You must study.", example_de: "Du musst lernen.", example_ja: "あなたは勉強しなければならない。" },
+      { id: 17, en: "may", de: "darf", ja: "〜してもよい", part: "modal",
+        example_en: "May I come in?", example_de: "Darf ich hereinkommen?", example_ja: "入ってもいいですか？" },
+      { id: 18, en: "should", de: "sollte", ja: "〜すべきだ", part: "modal",
+        example_en: "You should rest.", example_de: "Du solltest dich ausruhen.", example_ja: "休むべきです。" }
+    ];
+
+    // 言語表示用テキスト (UI)
+    const uiText = {
+      en: {
+        appTitle: "🌍 LangApp",
+        parts: { noun: "Nouns", verb: "Verbs", adj: "Adjectives", other: "Others", modal: "Modal Verbs" },
+        back: "← Back",
+        example: "Example",
+        audio: "🔊 Listen",
+        otherLanguages: "Other languages:",
+        loading: "Loading vocabulary..."
+      },
+      de: {
+        appTitle: "🌍 LangApp",
+        parts: { noun: "Nomen", verb: "Verben", adj: "Adjektive", other: "Andere", modal: "Modalverben" },
+        back: "← Zurück",
+        example: "Beispiel",
+        audio: "🔊 Anhören",
+        otherLanguages: "Andere Sprachen:",
+        loading: "Vokabeln werden geladen..."
+      },
+      ja: {
+        appTitle: "🌍 ラングアップ",
+        parts: { noun: "名詞", verb: "動詞", adj: "形容詞", other: "その他", modal: "助動詞" },
+        back: "← 戻る",
+        example: "例文",
+        audio: "🔊 再生",
+        otherLanguages: "他の言語:",
+        loading: "読み込み中..."
+      }
+    };
+
+    // 現在の言語とテーマ
+    let currentLang = "en";   // 'en', 'de', 'ja'
+    let currentTheme = "dark"; // 'dark', 'light'
+    let currentView = "list";   // 'list' or 'detail'
+    let selectedWordId = null;
+
+    // DOM 要素
+    const mainEl = document.getElementById("main-content");
+    const titleEl = document.getElementById("app-title");
+    const themeToggleBtn = document.getElementById("themeToggle");
+
+    // Helper: 言語ごとに単語の見出しを返す
+    function getLocalWord(word, lang) {
+      if (lang === "en") return word.en;
+      if (lang === "de") return word.de;
+      return word.ja;
+    }
+
+    // 例文を取得
+    function getLocalExample(word, lang) {
+      if (lang === "en") return word.example_en;
+      if (lang === "de") return word.example_de;
+      return word.example_ja;
+    }
+
+    // 音声読み上げ (Web Speech API)
+    function speakText(text, langCode) {
+      if (!window.speechSynthesis) {
+        alert("Sorry, your browser does not support speech synthesis.");
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      if (langCode === "en") utterance.lang = "en-US";
+      else if (langCode === "de") utterance.lang = "de-DE";
+      else if (langCode === "ja") utterance.lang = "ja-JP";
+      window.speechSynthesis.cancel(); // 重複防止
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // メインリスト描画 (品詞ごとにグループ化、助動詞を含む)
+    function renderListView() {
+      currentView = "list";
+      // グループ初期化 (modal追加)
+      const groups = {
+        noun: [],
+        verb: [],
+        adj: [],
+        other: [],
+        modal: []
+      };
+      vocabulary.forEach(word => {
+        if (groups.hasOwnProperty(word.part)) {
+          groups[word.part].push(word);
+        } else {
+          // 予期せぬpartはotherに
+          groups.other.push(word);
+        }
+      });
+
+      // 表示順: noun, verb, adj, modal, other
+      const partsOrder = ["noun", "verb", "adj", "modal", "other"];
+      let html = "";
+      for (let part of partsOrder) {
+        const words = groups[part];
+        if (!words || words.length === 0) continue;
+        const partTitle = uiText[currentLang].parts[part] || part;
+        html += `<div class="part-section">
+          <div class="part-title">${partTitle}</div>
+          <div class="word-grid">`;
+        words.forEach(word => {
+          const displayWord = getLocalWord(word, currentLang);
+          html += `<div class="word-card" data-id="${word.id}">
+            <div class="word-text">${escapeHtml(displayWord)}</div>
+            <div class="word-part">${partTitle}</div>
+          </div>`;
+        });
+        html += `</div></div>`;
+      }
+      mainEl.innerHTML = html || "<p>No words found.</p>";
+
+      // カードクリックイベント
+      document.querySelectorAll('.word-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const id = parseInt(card.dataset.id);
+          showDetailView(id);
+        });
+      });
+    }
+
+    // 詳細ページ描画
+    function showDetailView(wordId) {
+      const word = vocabulary.find(w => w.id === wordId);
+      if (!word) return;
+      selectedWordId = wordId;
+      currentView = "detail";
+
+      const displayWord = getLocalWord(word, currentLang);
+      const example = getLocalExample(word, currentLang);
+      const partLocal = uiText[currentLang].parts[word.part] || word.part;
+
+      // 他言語表記
+      const otherLangsHtml = `
+        <div class="other-langs">
+          <span>${uiText[currentLang].otherLanguages}</span>
+          <span>🇬🇧 ${word.en}</span>
+          <span>🇩🇪 ${word.de}</span>
+          <span>🇯🇵 ${word.ja}</span>
+        </div>
+      `;
+
+      const html = `
+        <div class="detail-container">
+          <button class="back-btn" id="backToListBtn">${uiText[currentLang].back}</button>
+          <div class="detail-word">${escapeHtml(displayWord)}</div>
+          <div class="detail-part">${escapeHtml(partLocal)}</div>
+          <div class="detail-card">
+            <div><strong>📖 ${uiText[currentLang].example}:</strong></div>
+            <div class="example">${escapeHtml(example)}</div>
+            <div class="audio-buttons">
+              <button class="audio-word" data-lang="${currentLang}">🔊 ${uiText[currentLang].audio} (${currentLang.toUpperCase()})</button>
+            </div>
+            ${otherLangsHtml}
+          </div>
+        </div>
+      `;
+      mainEl.innerHTML = html;
+
+      // 戻るボタン
+      document.getElementById("backToListBtn").addEventListener("click", () => {
+        renderListView();
+        updateHashForList();
+      });
+
+      // 音声ボタン
+      const audioBtn = document.querySelector(".audio-word");
+      if (audioBtn) {
+        audioBtn.addEventListener("click", () => {
+          const textToSpeak = `${displayWord}. ${example}`;
+          speakText(textToSpeak, currentLang);
+        });
+      }
+    }
+
+    // UI全体の文字列更新 (タイトル, フッターテキスト)
+    function updateUILabels() {
+      titleEl.innerText = uiText[currentLang].appTitle;
+      const footerDiv = document.getElementById("footer-contact");
+      if (footerDiv) {
+        if (currentLang === "en") footerDiv.innerHTML = `Contact us<br>mementomorikatsu@gmail.com`;
+        else if (currentLang === "de") footerDiv.innerHTML = `Kontaktieren Sie uns<br>mementomorikatsu@gmail.com`;
+        else footerDiv.innerHTML = `お問い合わせ<br>mementomorikatsu@gmail.com`;
+      }
+    }
+
+    // 再描画 (言語変更時など)
+    function refreshUI() {
+      updateUILabels();
+      if (currentView === "list") {
+        renderListView();
+      } else if (currentView === "detail" && selectedWordId !== null) {
+        showDetailView(selectedWordId);
+      }
+    }
+
+    // ハッシュルーティング 簡易版
+    function handleHashChange() {
+      const hash = window.location.hash;
+      if (hash.startsWith("#/detail/")) {
+        const id = parseInt(hash.split("/").pop());
+        if (!isNaN(id) && vocabulary.find(w => w.id === id)) {
+          currentView = "detail";
+          selectedWordId = id;
+          showDetailView(id);
+        } else {
+          renderListView();
+        }
+      } else {
+        renderListView();
+      }
+    }
+
+    function updateHashForList() {
+      window.location.hash = "#/";
+    }
+
+    function updateHashForDetail(id) {
+      window.location.hash = `#/detail/${id}`;
+    }
+
+    // カードクリック時のハッシュ更新 (showDetailViewをラップ)
+    const originalShowDetail = showDetailView;
+    window.showDetailView = (id) => {
+      originalShowDetail(id);
+      updateHashForDetail(id);
+    };
+
+    // テーマ切り替え
+    function initTheme() {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      currentTheme = savedTheme;
+      document.body.classList.remove("dark", "light");
+      document.body.classList.add(currentTheme);
+    }
+    function toggleTheme() {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      document.body.classList.remove("dark", "light");
+      document.body.classList.add(currentTheme);
+      localStorage.setItem("theme", currentTheme);
+    }
+
+    // 言語切り替え
+    function setLanguage(lang) {
+      if (lang === "en" || lang === "de" || lang === "ja") {
+        currentLang = lang;
+        localStorage.setItem("preferredLang", lang);
+        refreshUI();
+      }
+    }
+
+    // イベント登録, 初期化
+    function init() {
+      initTheme();
+      const savedLang = localStorage.getItem("preferredLang");
+      if (savedLang && ["en","de","ja"].includes(savedLang)) currentLang = savedLang;
+      else currentLang = "en";
+      
+      updateUILabels();
+
+      // テーマトグル
+      themeToggleBtn.addEventListener("click", toggleTheme);
+      
+      // 言語ボタン
+      document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const lang = btn.getAttribute("data-lang");
+          setLanguage(lang);
+        });
+      });
+
+      // ハッシュルーティング
+      window.addEventListener("hashchange", handleHashChange);
+      if (window.location.hash === "" || window.location.hash === "#/") {
+        renderListView();
+      } else {
+        handleHashChange();
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+      });
+    }
+
+    // showDetailView のオーバーライド反映
+    window.showDetailView = (id) => {
+      originalShowDetail(id);
+      updateHashForDetail(id);
+    };
+
+    // 初期呼び出し
+    init();
+  </script>
+</body>
+</html>
